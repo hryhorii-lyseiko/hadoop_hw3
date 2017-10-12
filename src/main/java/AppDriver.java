@@ -42,11 +42,17 @@ public class AppDriver extends Configured implements Tool {
         FileStatus[] status_list = fs.listStatus(new Path(args[0]));
         if(status_list != null){
             for(FileStatus status : status_list){
-                MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, BidPriceMapper.class);
+                MultipleInputs.addInputPath(job, status.getPath(), TextInputFormat.class, BidPriceMapper.class);
             }
         }
 
-        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, CityMapper.class);
+        FileStatus[] status_list1 = fs.listStatus(new Path(args[1]));
+        if(status_list != null){
+            for(FileStatus status : status_list1){
+                MultipleInputs.addInputPath(job, status.getPath(), TextInputFormat.class, CityMapper.class);
+            }
+        }
+        //MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, CityMapper.class);
 
         FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
@@ -57,7 +63,6 @@ public class AppDriver extends Configured implements Tool {
         job.setCombinerKeyGroupingComparatorClass(GroupComparator.class);
         job.setPartitionerClass(CustomPartitioner.class);
         job.setGroupingComparatorClass(GroupComparator.class);
-        job.setMapperClass(BidPriceMapper.class);
         job.setCombinerClass(BidCommbainer.class);
         job.setReducerClass(BidReducer.class);
         job.setMapOutputKeyClass(CustomKey.class);
